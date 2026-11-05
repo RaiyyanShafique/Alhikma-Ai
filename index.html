@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hikmah AI - Authentic Islamic Assistant</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: { extend: {
+                colors: {
+                    midnight: { 950: '#060a17', 900: '#0b132b', 800: '#1c2541', 700: '#2a3962' },
+                    emeraldGlow: '#10b981', goldGlow: '#f59e0b', cyanGlow: '#38bdf8',
+                },
+                fontFamily: { sans: ['Plus Jakarta Sans', 'sans-serif'], arabic: ['Amiri', 'serif'] }
+            } }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #060a17;
+            background-image:
+                radial-gradient(circle at 15% 15%, rgba(56, 189, 248, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 85% 85%, rgba(16, 185, 129, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, rgba(15, 23, 42, 0.8) 0%, transparent 100%);
+            background-attachment: fixed;
+        }
+        .islamic-bg-pattern {
+            background-image: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M40 0l10 30h30l-24 18 9 30-25-18-25 18 9-30-24-18h30z' fill='%23ffffff' fill-opacity='0.015'/%3E%3C/svg%3E");
+        }
+        .glass-panel { background: rgba(15, 23, 42, 0.65); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 8px 32px 0 rgba(0,0,0,0.37); }
+        .glass-card { background: rgba(28, 37, 65, 0.4); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.07); }
+        .glass-input { background: rgba(11, 19, 43, 0.7); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.12); }
+        .glass-input:focus { border-color: rgba(56,189,248,0.5); box-shadow: 0 0 15px rgba(56,189,248,0.2); }
+        .hadith-card { background: linear-gradient(135deg, rgba(16,185,129,0.1) 0%, rgba(11,19,43,0.6) 100%); border-left: 4px solid #10b981; border-top: 1px solid rgba(16,185,129,0.2); border-right: 1px solid rgba(16,185,129,0.1); border-bottom: 1px solid rgba(16,185,129,0.1); }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(6,10,23,0.5); }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 9999px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.3); }
+        .prose-custom { color: #e2e8f0; line-height: 1.7; }
+        .prose-custom strong { color: #38bdf8; font-weight: 600; }
+        .prose-custom ul { list-style-type: disc; padding-left: 1.25rem; margin: 0.5rem 0; }
+        .prose-custom ol { list-style-type: decimal; padding-left: 1.25rem; margin: 0.5rem 0; }
+        .prose-custom p { margin-bottom: 0.75rem; }
+        .prose-custom p:last-child { margin-bottom: 0; }
+    </style>
+</head>
+<body class="h-full text-slate-200 font-sans islamic-bg-pattern flex flex-col justify-between antialiased selection:bg-cyan-500/30 selection:text-cyan-200">
+
+    <header class="w-full max-w-5xl mx-auto pt-4 px-4 sm:px-6">
+        <div class="glass-panel rounded-2xl p-4 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500/20 to-emerald-500/20 border border-white/10 flex items-center justify-center text-cyan-400 text-xl shadow-lg shadow-cyan-950/50">
+                    <i class="fa-solid fa-kaaba"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg text-white tracking-wide flex items-center gap-2">
+                        Hikmah AI <span class="text-xs font-normal px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Authentic Knowledge</span>
+                    </h1>
+                    <p class="text-xs text-slate-400">Grounded strictly in Quran &amp; Authentic Sahih Hadith</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <div class="relative inline-block text-left">
+                    <select id="langSelect" class="glass-input text-xs text-slate-200 py-2 px-3 rounded-xl focus:outline-none cursor-pointer border border-white/10 hover:border-cyan-500/40 transition-colors">
+                        <option value="English" class="bg-slate-900 text-slate-200">🇬🇧 English</option>
+                        <option value="Hinglish" class="bg-slate-900 text-slate-200" selected>🇮🇳 Hinglish (Roman)</option>
+                        <option value="Hindi" class="bg-slate-900 text-slate-200">🇮🇳 हिंदी (Hindi)</option>
+                    </select>
+                </div>
+                <button id="clearChatBtn" title="Clear Conversation" class="p-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-all duration-200 border border-transparent hover:border-white/10">
+                    <i class="fa-solid fa-rotate-right"></i>
+                </button>
+                <button id="settingsBtn" title="API Key Settings" class="p-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-all duration-200 border border-transparent hover:border-white/10">
+                    <i class="fa-solid fa-gear"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 w-full max-w-5xl mx-auto p-4 sm:p-6 flex flex-col min-h-0">
+        <div id="chatContainer" class="flex-1 overflow-y-auto space-y-4 pr-1 sm:pr-2 mb-4 scroll-smooth">
+            <div id="welcomeCard" class="glass-card rounded-2xl p-5 sm:p-6 text-slate-200 relative overflow-hidden border border-white/10">
+                <div class="absolute -right-6 -bottom-6 text-8xl text-cyan-500/5 pointer-events-none font-arabic">ﷺ</div>
+                <div class="flex items-start gap-4">
+                    <div class="w-10 h-10 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 shrink-0 mt-1">
+                        <i class="fa-solid fa-mosque"></i>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-2">
+                            <span class="font-bold text-white text-base">Hikmah Assistant</span>
+                            <span class="text-xs text-slate-400">Assalamu Alaikum</span>
+                        </div>
+                        <p id="welcomeText" class="text-sm sm:text-base text-slate-300 leading-relaxed"></p>
+                        <div class="hadith-card rounded-xl p-4 my-2 text-sm text-slate-200">
+                            <div class="flex items-center gap-2 text-emerald-400 font-semibold mb-1 text-xs uppercase tracking-wider">
+                                <i class="fa-solid fa-book-quran"></i> Core Islamic Principle
+                            </div>
+                            <p id="hadithSpotlightText" class="italic text-slate-300 mb-2"></p>
+                            <span class="text-xs text-emerald-400 font-medium">— Muwatta Malik (Authentic)</span>
+                        </div>
+                        <div class="pt-2">
+                            <p class="text-xs font-semibold text-slate-400 mb-2 uppercase tracking-wider" id="suggestedTitle"></p>
+                            <div class="flex flex-wrap gap-2" id="suggestedPrompts"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass-panel rounded-2xl p-2.5 sm:p-3 relative">
+            <form id="chatForm" class="flex items-center gap-2">
+                <button type="button" id="voiceBtn" title="Voice Input" class="p-3 rounded-xl text-slate-400 hover:text-cyan-300 hover:bg-white/5 transition-all duration-200 border border-transparent hover:border-white/10 shrink-0">
+                    <i class="fa-solid fa-microphone"></i>
+                </button>
+                <textarea id="userInput" rows="1" placeholder="" class="glass-input w-full rounded-xl px-4 py-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none resize-none max-h-32 overflow-y-auto leading-relaxed"></textarea>
+                <button type="submit" id="sendBtn" class="bg-gradient-to-r from-cyan-600 to-emerald-600 hover:from-cyan-500 hover:to-emerald-500 text-white p-3.5 rounded-xl font-medium transition-all duration-200 shadow-lg shadow-cyan-950/50 flex items-center justify-center shrink-0 disabled:opacity-50 disabled:cursor-not-allowed">
+                    <i class="fa-solid fa-paper-plane text-sm"></i>
+                </button>
+            </form>
+            <div id="listeningIndicator" class="hidden absolute top-2 left-14 bg-cyan-950/90 border border-cyan-500/30 text-cyan-300 text-xs px-3 py-1.5 rounded-full items-center gap-2 shadow-lg">
+                <span class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
+                <span>Listening to your voice...</span>
+            </div>
+        </div>
+        <p class="text-[11px] text-center text-slate-500 mt-2">
+            Hikmah AI strictly highlights primary sources (Quran &amp; Sahih Collections). For individual legal verdicts (Fatwa), please consult qualified local scholars.
+        </p>
+    </main>
+
+    <div id="settingsModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 z-50 opacity-0 pointer-events-none transition-all duration-300">
+        <div class="glass-panel w-full max-w-md rounded-2xl p-6 border border-white/10 shadow-2xl space-y-5 transform scale-95 transition-all duration-300" id="settingsContent">
+            <div class="flex items-center justify-between pb-3 border-b border-white/10">
+                <h3 class="font-bold text-lg text-white flex items-center gap-2">
+                    <i class="fa-solid fa-key text-cyan-400"></i> Gemini API Key Settings
+                </h3>
+                <button id="closeSettingsBtn" class="text-slate-400 hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <p class="text-xs text-slate-300 leading-relaxed">
+                Hikmah AI uses Google's Gemini Flash model to provide thoughtful and fast responses. Enter your own API key below to start chatting.
+            </p>
+            <div class="space-y-2">
+                <label class="text-xs font-semibold text-slate-300 uppercase tracking-wider block">Your Gemini API Key</label>
+                <input type="password" id="apiKeyInput" placeholder="AIzaSy..." class="glass-input w-full rounded-xl px-4 py-2.5 text-sm text-slate-100 placeholder-slate-600 focus:outline-none">
+                <p class="text-[11px] text-slate-500">Your key is stored locally only in your browser session.</p>
+            </div>
+            <div class="flex justify-end gap-3 pt-2">
+                <button id="saveKeyBtn" class="bg-emerald-600 hover:bg-emerald-500 text-white px-5 py-2.5 rounded-xl text-xs font-semibold transition-all">Save Key</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="fixed bottom-20 left-1/2 -translate-x-1/2 bg-slate-900/90 text-slate-200 border border-white/10 px-4 py-2 rounded-full text-xs shadow-xl backdrop-blur-md opacity-0 transition-opacity duration-300 pointer-events-none z-50 flex items-center gap-2">
+        <i id="toastIcon" class="fa-solid fa-circle-check text-emerald-400"></i>
+        <span id="toastMsg"></span>
+    </div>
+
+    <script>
+        const LANG_PRESETS = {
+            English: {
+                welcome: `<span class="font-arabic text-emerald-300 text-lg block mb-1">السَّلاَمُ عَلَيْكُمْ وَرَحْمَةُ اللهِ وَبَرَكَاتُهُ</span>Welcome! I am <strong>Hikmah AI</strong>, designed to respectfully answer your Islamic questions. All explanations are strictly derived from the <strong>Noble Quran</strong> and verified <strong>Authentic Hadith (Sahih)</strong>, without adhering to or favoring any particular sect or controversy.`,
+                placeholder: "Ask your Islamic query respectfully... (e.g., How to improve focus in Salah?)",
+                hadith: `"The Prophet Muhammad (ﷺ) said: 'I have left among you two things. You will never go astray so long as you hold fast to them: the Book of Allah and the Sunnah of His Apostle.'"`,
+                suggestedTitle: "Suggested Topics:",
+                listening: "Listening to your voice...",
+                prompts: [
+                    { icon: "fa-hands-praying", color: "cyan", text: "Etiquettes of Dua & Acceptance" },
+                    { icon: "fa-moon", color: "emerald", text: "Virtues & Benefits of Tahajjud" },
+                    { icon: "fa-heart", color: "amber", text: "Rights of Parents in Islam" },
+                    { icon: "fa-scale-balanced", color: "purple", text: "Islamic Ethics in Business" }
+                ]
+            },
+            Hinglish: {
+                welcome: `<span class="font-arabic text-emerald-300 text-lg block mb-1">السَّلاَمُ عَلَيْكُمْ وَرَحْمَةُ اللهِ وَبَرَكَاتُهُ</span>Welcome! Main <strong>Hikmah AI</strong> hoon. Aapke Islamic sawalon ke jawab Quran aur Authentic Sahih Hadith ki roshni me izzat aur tamiz ke sath dunga. Kisi maslak ya behas ke bina, sirf sahih hawale ke sath guide karunga.`,
+                placeholder: "Aap apna Islamic sawal pooch sakte hain... (e.g., Namaz me khushoo kaise layein?)",
+                hadith: `"Nabi-e-Kareem (ﷺ) ne farmaya: 'Main tumhare beech do cheezein chhod kar ja raha hoon, jab tak tum unhe mazbooti se pakde rahoge hargiz gumrah nahi hoge: Allah ki Kitab (Quran) aur Uske Rasool ki Sunnat.'"`,
+                suggestedTitle: "Poochne ke liye topic chunein:",
+                listening: "Aapki awaz sun raha hoon...",
+                prompts: [
+                    { icon: "fa-hands-praying", color: "cyan", text: "Dua qbool hone ke adab aur tarika" },
+                    { icon: "fa-moon", color: "emerald", text: "Tahajjud ki namaz ke fayde aur fazilat" },
+                    { icon: "fa-heart", color: "amber", text: "Waldain (Parents) ke haqooq Islam me" },
+                    { icon: "fa-scale-balanced", color: "purple", text: "Karobar me halaal kamai ke rules" }
+                ]
+            },
+            Hindi: {
+                welcome: `<span class="font-arabic text-emerald-300 text-lg block mb-1">السَّلاَمُ عَلَيْكُمْ وَرَحْمَةُ اللهِ وَبَرَكَاتُهُ</span>स्वागत है! मैं <strong>Hikmah AI</strong> हूँ। आपके इस्लामिक प्रश्नों के उत्तर पवित्र <strong>क़ुरआन</strong> और प्रमाणित <strong>सहीह हदीस</strong> के आधार पर अत्यंत सम्मानपूर्वक प्रस्तुत करूँगा। बिना किसी फ़िरक़ापरस्ती या विवाद के, केवल प्रामाणिक संदर्भों के साथ।`,
+                placeholder: "अपना इस्लामिक प्रश्न यहाँ पूछें... (जैसे: नमाज़ में ध्यान कैसे लगाएँ?)",
+                hadith: `"नबी करीम (ﷺ) ने फ़रमाया: 'मैं तुम्हारे बीच दो चीज़ें छोड़े जा रहा हूँ, जब तक तुम उन्हें मज़बूती से थामे रहोगे कभी गुमराह नहीं होगे: अल्लाह की किताब और उसके रसूल की सुन्नत।'"`,
+                suggestedTitle: "सुझाए गए विषय:",
+                listening: "आपकी आवाज़ सुन रहा हूँ...",
+                prompts: [
+                    { icon: "fa-hands-praying", color: "cyan", text: "दुआ क़बूल होने के आदाब और तरीक़ा" },
+                    { icon: "fa-moon", color: "emerald", text: "तहज्जुद की नमाज़ के फ़ायदे और फ़ज़ीलत" },
+                    { icon: "fa-heart", color: "amber", text: "इस्लाम में माता-पिता (वालदैन) के अधिकार" },
+                    { icon: "fa-scale-balanced", color: "purple", text: "व्यापार में हलाल कमाई के नियम" }
+                ]
+            }
+        };
+
+        const CHIP_COLORS = {
+            cyan: "text-cyan-300 hover:bg-cyan-500/10 hover:border-cyan-500/40",
+            emerald: "text-emerald-300 hover:bg-emerald-500/10 hover:border-emerald-500/40",
+            amber: "text-amber-300 hover:bg-amber-500/10 hover:border-amber-500/40",
+            purple: "text-purple-300 hover:bg-purple-500/10 hover:border-purple-500/40"
+        };
+        const SPEECH_LANG = { English: 'en-IN', Hinglish: 'hi-IN', Hindi: 'hi-IN' };
+        const MODEL = 'gemini-2.0-flash';
+
+        const $ = id => document.getElementById(id);
+        let currentLang = 'Hinglish';
+        let history = [];
+        let busy = false;
+        let apiKey = '';
+        try { apiKey = sessionStorage.getItem('hikmah_api_key') || ''; } catch (e) {}
+
+        function getSystemInstruction(language) {
+            return `You are "Hikmah Assistant", a respectful, highly knowledgeable, polite, and peace-loving Islamic AI Assistant.
+
+SELECTED LANGUAGE MANDATE:
+You MUST respond strictly in ${language.toUpperCase()}.
+- If the language is "ENGLISH": Respond in clear, polite English.
+- If the language is "HINGLISH": Respond in natural conversational Hinglish (Hindi written using the Roman/English alphabet, e.g., "Assalamu Alaikum brother, Quran me Allah Ta'ala farmata hai...").
+- If the language is "HINDI": Respond in Hindi using Devanagari script.
+
+SOURCE RULES:
+- Base every answer strictly on the Noble Quran and Authentic (Sahih) Hadith (Sahih Bukhari, Sahih Muslim and other verified collections).
+- Cite sources clearly (Surah name and verse number; Hadith collection and number) whenever possible.
+- Never invent verses, hadith, or references. If you are unsure or no authentic source is known, say so honestly.
+- Quote Arabic text of verses/hadith when helpful, followed by a translation in the selected language.
+
+CONDUCT RULES:
+- Do not favor or criticize any sect, school (maslak), or group. Avoid controversial and divisive topics; present only broadly agreed, well-sourced guidance.
+- Always be respectful, gentle, and use honorifics (e.g., ﷺ after the Prophet's name).
+- Do not issue personal fatwas. For individual legal rulings, advise consulting a qualified local scholar.
+- Use clear structure: short paragraphs, bullet points where helpful, and **bold** for key terms.
+- Stay on Islamic topics; politely redirect unrelated requests.`;
+        }
+
+        function showToast(msg, ok = true) {
+            $('toastMsg').textContent = msg;
+            $('toastIcon').className = ok ? 'fa-solid fa-circle-check text-emerald-400' : 'fa-solid fa-circle-exclamation text-amber-400';
+            $('toast').classList.remove('opacity-0');
+            clearTimeout(showToast.t);
+            showToast.t = setTimeout(() => $('toast').classList.add('opacity-0'), 2600);
+        }
+
+        function applyLang() {
+            const p = LANG_PRESETS[currentLang];
+            $('userInput').placeholder = p.placeholder;
+            $('listeningIndicator').lastElementChild.textContent = p.listening;
+            const w = $('welcomeText');
+            if (!w) return;
+            w.innerHTML = p.welcome;
+            $('hadithSpotlightText').textContent = p.hadith;
+            $('suggestedTitle').textContent = p.suggestedTitle;
+            const box = $('suggestedPrompts');
+            box.innerHTML = '';
+            p.prompts.forEach(item => {
+                const b = document.createElement('button');
+                b.type = 'button';
+                b.className = `glass-input text-xs px-3 py-2 rounded-xl transition-all flex items-center gap-2 ${CHIP_COLORS[item.color]}`;
+                const i = document.createElement('i');
+                i.className = `fa-solid ${item.icon}`;
+                b.append(i, document.createTextNode(item.text));
+                b.addEventListener('click', () => sendMessage(item.text));
+                box.appendChild(b);
+            });
+        }
+
+        function scrollDown() {
+            const c = $('chatContainer');
+            c.scrollTop = c.scrollHeight;
+        }
+
+        function addMessage(role, text) {
+            const wrap = document.createElement('div');
+            if (role === 'user') {
+                wrap.className = 'flex justify-end';
+                const bubble = document.createElement('div');
+                bubble.className = 'max-w-[85%] bg-gradient-to-r from-cyan-600/80 to-emerald-600/80 text-white rounded-2xl rounded-tr-sm px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap border border-white/10';
+                bubble.textContent = text;
+                wrap.appendChild(bubble);
+            } else {
+                wrap.className = 'flex items-start gap-3';
+                wrap.innerHTML = `<div class="w-9 h-9 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 shrink-0"><i class="fa-solid fa-mosque text-sm"></i></div>
+                    <div class="glass-card rounded-2xl rounded-tl-sm px-4 py-3 text-sm max-w-[88%] prose-custom"></div>`;
+                const body = wrap.lastElementChild;
+                if (text === null) {
+                    body.innerHTML = '<span class="text-slate-400 flex items-center gap-2"><i class="fa-solid fa-circle-notch fa-spin"></i> ...</span>';
+                } else {
+                    body.innerHTML = marked.parse(text);
+                }
+            }
+            $('chatContainer').appendChild(wrap);
+            scrollDown();
+            return wrap;
+        }
+
+        async function sendMessage(text) {
+            text = (text || '').trim();
+            if (!text || busy) return;
+            if (!apiKey) {
+                showToast('Please add your Gemini API key in settings', false);
+                openSettings();
+                return;
+            }
+            const welcome = $('welcomeCard');
+            if (welcome) welcome.remove();
+
+            busy = true;
+            $('sendBtn').disabled = true;
+            $('userInput').value = '';
+            $('userInput').style.height = 'auto';
+            addMessage('user', text);
+            const loader = addMessage('bot', null);
+            history.push({ role: 'user', parts: [{ text }] });
+
+            try {
+                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
+                    body: JSON.stringify({
+                        systemInstruction: { parts: [{ text: getSystemInstruction(currentLang) }] },
+                        contents: history,
+                        generationConfig: { temperature: 0.4, maxOutputTokens: 1500 }
+                    })
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error?.message || `Request failed (${res.status})`);
+                const reply = data.candidates?.[0]?.content?.parts?.map(p => p.text || '').join('') || '';
+                if (!reply) throw new Error('Empty response received.');
+                history.push({ role: 'model', parts: [{ text: reply }] });
+                loader.lastElementChild.innerHTML = marked.parse(reply);
+            } catch (err) {
+                history.pop();
+                loader.lastElementChild.innerHTML = '';
+                const msg = document.createElement('span');
+                msg.className = 'text-amber-300';
+                msg.textContent = 'Error: ' + err.message;
+                loader.lastElementChild.appendChild(msg);
+            } finally {
+                busy = false;
+                $('sendBtn').disabled = false;
+                scrollDown();
+            }
+        }
+
+        // Form + textarea
+        $('chatForm').addEventListener('submit', e => { e.preventDefault(); sendMessage($('userInput').value); });
+        $('userInput').addEventListener('keydown', e => {
+            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage($('userInput').value); }
+        });
+        $('userInput').addEventListener('input', e => {
+            e.target.style.height = 'auto';
+            e.target.style.height = Math.min(e.target.scrollHeight, 128) + 'px';
+        });
+
+        // Language
+        $('langSelect').addEventListener('change', e => { currentLang = e.target.value; applyLang(); });
+
+        // Clear chat
+        const welcomeHTML = $('welcomeCard').outerHTML;
+        $('clearChatBtn').addEventListener('click', () => {
+            history = [];
+            $('chatContainer').innerHTML = welcomeHTML;
+            applyLang();
+            showToast('Conversation cleared');
+        });
+
+        // Settings modal
+        function openSettings() {
+            $('apiKeyInput').value = apiKey;
+            $('settingsModal').classList.remove('opacity-0', 'pointer-events-none');
+            $('settingsContent').classList.remove('scale-95');
+        }
+        function closeSettings() {
+            $('settingsModal').classList.add('opacity-0', 'pointer-events-none');
+            $('settingsContent').classList.add('scale-95');
+        }
+        $('settingsBtn').addEventListener('click', openSettings);
+        $('closeSettingsBtn').addEventListener('click', closeSettings);
+        $('settingsModal').addEventListener('click', e => { if (e.target === $('settingsModal')) closeSettings(); });
+        $('saveKeyBtn').addEventListener('click', () => {
+            apiKey = $('apiKeyInput').value.trim();
+            try { sessionStorage.setItem('hikmah_api_key', apiKey); } catch (e) {}
+            closeSettings();
+            showToast(apiKey ? 'API key saved' : 'API key removed');
+        });
+
+        // Voice input
+        const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+        let recognizer = null, listening = false;
+        $('voiceBtn').addEventListener('click', () => {
+            if (!SR) { showToast('Voice input is not supported in this browser', false); return; }
+            if (listening) { recognizer.stop(); return; }
+            recognizer = new SR();
+            recognizer.lang = SPEECH_LANG[currentLang];
+            recognizer.interimResults = false;
+            recognizer.onstart = () => {
+                listening = true;
+                $('listeningIndicator').classList.replace('hidden', 'flex');
+                $('voiceBtn').classList.add('text-cyan-300');
+            };
+            recognizer.onresult = e => {
+                const t = e.results[0][0].transcript;
+                $('userInput').value = ($('userInput').value + ' ' + t).trim();
+                $('userInput').dispatchEvent(new Event('input'));
+            };
+            recognizer.onerror = () => showToast('Could not capture voice', false);
+            recognizer.onend = () => {
+                listening = false;
+                $('listeningIndicator').classList.replace('flex', 'hidden');
+                $('voiceBtn').classList.remove('text-cyan-300');
+            };
+            recognizer.start();
+        });
+
+        applyLang();
+    </script>
+</body>
+</html>
