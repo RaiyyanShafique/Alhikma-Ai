@@ -10,6 +10,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.2.6/dist/purify.min.js"></script>
     <script>
         tailwind.config = {
             theme: { extend: {
@@ -76,9 +77,6 @@
                 <button id="clearChatBtn" title="Clear Conversation" class="p-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-all duration-200 border border-transparent hover:border-white/10">
                     <i class="fa-solid fa-rotate-right"></i>
                 </button>
-                <button id="settingsBtn" title="API Key Settings" class="p-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-all duration-200 border border-transparent hover:border-white/10">
-                    <i class="fa-solid fa-gear"></i>
-                </button>
             </div>
         </div>
     </header>
@@ -132,28 +130,6 @@
             Hikmah AI strictly highlights primary sources (Quran &amp; Sahih Collections). For individual legal verdicts (Fatwa), please consult qualified local scholars.
         </p>
     </main>
-
-    <div id="settingsModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 z-50 opacity-0 pointer-events-none transition-all duration-300">
-        <div class="glass-panel w-full max-w-md rounded-2xl p-6 border border-white/10 shadow-2xl space-y-5 transform scale-95 transition-all duration-300" id="settingsContent">
-            <div class="flex items-center justify-between pb-3 border-b border-white/10">
-                <h3 class="font-bold text-lg text-white flex items-center gap-2">
-                    <i class="fa-solid fa-key text-cyan-400"></i> Gemini API Key Settings
-                </h3>
-                <button id="closeSettingsBtn" class="text-slate-400 hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
-            </div>
-            <p class="text-xs text-slate-300 leading-relaxed">
-                Hikmah AI uses Google's Gemini Flash model to provide thoughtful and fast responses. Enter your own API key below to start chatting.
-            </p>
-            <div class="space-y-2">
-                <label class="text-xs font-semibold text-slate-300 uppercase tracking-wider block">Your Gemini API Key</label>
-                <input type="password" id="apiKeyInput" placeholder="AIzaSy..." class="glass-input w-full rounded-xl px-4 py-2.5 text-sm text-slate-100 placeholder-slate-600 focus:outline-none">
-                <p class="text-[11px] text-slate-500">Your key is stored locally only in your browser session.</p>
-            </div>
-            <div class="flex justify-end gap-3 pt-2">
-                <button id="saveKeyBtn" class="bg-emerald-600 hover:bg-emerald-500 text-white px-5 py-2.5 rounded-xl text-xs font-semibold transition-all">Save Key</button>
-            </div>
-        </div>
-    </div>
 
     <div id="toast" class="fixed bottom-20 left-1/2 -translate-x-1/2 bg-slate-900/90 text-slate-200 border border-white/10 px-4 py-2 rounded-full text-xs shadow-xl backdrop-blur-md opacity-0 transition-opacity duration-300 pointer-events-none z-50 flex items-center gap-2">
         <i id="toastIcon" class="fa-solid fa-circle-check text-emerald-400"></i>
@@ -210,38 +186,11 @@
             purple: "text-purple-300 hover:bg-purple-500/10 hover:border-purple-500/40"
         };
         const SPEECH_LANG = { English: 'en-IN', Hinglish: 'hi-IN', Hindi: 'hi-IN' };
-        const MODEL = 'gemini-2.0-flash';
 
         const $ = id => document.getElementById(id);
         let currentLang = 'Hinglish';
         let history = [];
         let busy = false;
-        let apiKey = '';
-        try { apiKey = sessionStorage.getItem('hikmah_api_key') || ''; } catch (e) {}
-
-        function getSystemInstruction(language) {
-            return `You are "Hikmah Assistant", a respectful, highly knowledgeable, polite, and peace-loving Islamic AI Assistant.
-
-SELECTED LANGUAGE MANDATE:
-You MUST respond strictly in ${language.toUpperCase()}.
-- If the language is "ENGLISH": Respond in clear, polite English.
-- If the language is "HINGLISH": Respond in natural conversational Hinglish (Hindi written using the Roman/English alphabet, e.g., "Assalamu Alaikum brother, Quran me Allah Ta'ala farmata hai...").
-- If the language is "HINDI": Respond in Hindi using Devanagari script.
-
-SOURCE RULES:
-- Base every answer strictly on the Noble Quran and Authentic (Sahih) Hadith (Sahih Bukhari, Sahih Muslim and other verified collections).
-- Cite sources clearly (Surah name and verse number; Hadith collection and number) whenever possible.
-- Never invent verses, hadith, or references. If you are unsure or no authentic source is known, say so honestly.
-- Quote Arabic text of verses/hadith when helpful, followed by a translation in the selected language.
-
-CONDUCT RULES:
-- Do not favor or criticize any sect, school (maslak), or group. Avoid controversial and divisive topics; present only broadly agreed, well-sourced guidance.
-- Always be respectful, gentle, and use honorifics (e.g., ﷺ after the Prophet's name).
-- Do not issue personal fatwas. For individual legal rulings, advise consulting a qualified local scholar.
-- Use clear structure: short paragraphs, bullet points where helpful, and **bold** for key terms.
-- Stay on Islamic topics; politely redirect unrelated requests.`;
-        }
-
         function showToast(msg, ok = true) {
             $('toastMsg').textContent = msg;
             $('toastIcon').className = ok ? 'fa-solid fa-circle-check text-emerald-400' : 'fa-solid fa-circle-exclamation text-amber-400';
@@ -294,7 +243,7 @@ CONDUCT RULES:
                 if (text === null) {
                     body.innerHTML = '<span class="text-slate-400 flex items-center gap-2"><i class="fa-solid fa-circle-notch fa-spin"></i> ...</span>';
                 } else {
-                    body.innerHTML = marked.parse(text);
+                    body.innerHTML = DOMPurify.sanitize(marked.parse(text));
                 }
             }
             $('chatContainer').appendChild(wrap);
@@ -305,11 +254,7 @@ CONDUCT RULES:
         async function sendMessage(text) {
             text = (text || '').trim();
             if (!text || busy) return;
-            if (!apiKey) {
-                showToast('Please add your Gemini API key in settings', false);
-                openSettings();
-                return;
-            }
+
             const welcome = $('welcomeCard');
             if (welcome) welcome.remove();
 
@@ -322,27 +267,37 @@ CONDUCT RULES:
             history.push({ role: 'user', parts: [{ text }] });
 
             try {
-                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`, {
+                // Keep the latest 20 messages to limit request size.
+                let recentHistory = history.slice(-20);
+                if (recentHistory.length && recentHistory[0].role === 'model') {
+                    recentHistory = recentHistory.slice(1);
+                }
+
+                const res = await fetch('/api/chat', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        systemInstruction: { parts: [{ text: getSystemInstruction(currentLang) }] },
-                        contents: history,
-                        generationConfig: { temperature: 0.4, maxOutputTokens: 1500 }
+                        contents: recentHistory,
+                        language: currentLang
                     })
                 });
-                const data = await res.json();
-                if (!res.ok) throw new Error(data.error?.message || `Request failed (${res.status})`);
-                const reply = data.candidates?.[0]?.content?.parts?.map(p => p.text || '').join('') || '';
-                if (!reply) throw new Error('Empty response received.');
+
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok) {
+                    throw new Error(data.error || `Request failed (${res.status})`);
+                }
+
+                const reply = data.reply || '';
+                if (!reply) throw new Error('No response received. Please try again.');
+
                 history.push({ role: 'model', parts: [{ text: reply }] });
-                loader.lastElementChild.innerHTML = marked.parse(reply);
+                loader.lastElementChild.innerHTML = DOMPurify.sanitize(marked.parse(reply));
             } catch (err) {
                 history.pop();
                 loader.lastElementChild.innerHTML = '';
                 const msg = document.createElement('span');
                 msg.className = 'text-amber-300';
-                msg.textContent = 'Error: ' + err.message;
+                msg.textContent = 'Error: ' + (err.message || 'Something went wrong.');
                 loader.lastElementChild.appendChild(msg);
             } finally {
                 busy = false;
@@ -371,26 +326,6 @@ CONDUCT RULES:
             $('chatContainer').innerHTML = welcomeHTML;
             applyLang();
             showToast('Conversation cleared');
-        });
-
-        // Settings modal
-        function openSettings() {
-            $('apiKeyInput').value = apiKey;
-            $('settingsModal').classList.remove('opacity-0', 'pointer-events-none');
-            $('settingsContent').classList.remove('scale-95');
-        }
-        function closeSettings() {
-            $('settingsModal').classList.add('opacity-0', 'pointer-events-none');
-            $('settingsContent').classList.add('scale-95');
-        }
-        $('settingsBtn').addEventListener('click', openSettings);
-        $('closeSettingsBtn').addEventListener('click', closeSettings);
-        $('settingsModal').addEventListener('click', e => { if (e.target === $('settingsModal')) closeSettings(); });
-        $('saveKeyBtn').addEventListener('click', () => {
-            apiKey = $('apiKeyInput').value.trim();
-            try { sessionStorage.setItem('hikmah_api_key', apiKey); } catch (e) {}
-            closeSettings();
-            showToast(apiKey ? 'API key saved' : 'API key removed');
         });
 
         // Voice input
